@@ -1407,7 +1407,14 @@ public abstract class JobsDAO {
     }
 
     public void recordPlayersLimitsAsync(JobsPlayer player) {
-        this.service.execute(() -> recordPlayersLimits(player));
+        player.addSavingTask();
+        this.service.execute(() -> {
+            try {
+                recordPlayersLimits(player);
+            } finally {
+                player.finishSavingTask();
+            }
+        });
     }
 
     public synchronized void recordPlayersLimits(JobsPlayer jPlayer) {
@@ -1993,7 +2000,14 @@ public abstract class JobsDAO {
     private final ExecutorService service = Executors.newCachedThreadPool();
 
     public void saveAsync(JobsPlayer player) {
-        this.service.execute(() -> save(player));
+        player.addSavingTask();
+        this.service.execute(() -> {
+            try {
+                save(player);
+            } finally {
+                player.finishSavingTask();
+            }
+        });
     }
 
     /**
@@ -2026,7 +2040,14 @@ public abstract class JobsDAO {
     }
 
     public void updateSeenAsync(JobsPlayer player) {
-        this.service.execute(() -> updateSeen(player));
+        player.addSavingTask();
+        this.service.execute(() -> {
+            try {
+                updateSeen(player);
+            } finally {
+                player.finishSavingTask();
+            }
+        });
     }
 
     public void updateSeen(JobsPlayer player) {
@@ -2140,7 +2161,14 @@ public abstract class JobsDAO {
     }
 
     public void savePointsAsync(JobsPlayer player) {
-        this.service.execute(() -> savePoints(player));
+        player.addSavingTask();
+        this.service.execute(() -> {
+            try {
+                savePoints(player);
+            } finally {
+                player.finishSavingTask();
+            }
+        });
     }
 
     public void savePoints(JobsPlayer jPlayer) {
@@ -2222,7 +2250,14 @@ public abstract class JobsDAO {
     }
 
     public void saveLogAsync(JobsPlayer player) {
-        this.service.execute(() -> saveLog(player));
+        player.addSavingTask();
+        this.service.execute(() -> {
+            try {
+                saveLog(player);
+            } finally {
+                player.finishSavingTask();
+            }
+        });
     }
 
     /**

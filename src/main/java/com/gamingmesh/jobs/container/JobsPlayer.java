@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -73,6 +74,8 @@ public class JobsPlayer {
     private String honorific;
     // player save status
     private volatile boolean isSaved = true;
+    // player saving task count
+    private final AtomicInteger savingTaskCount = new AtomicInteger(0);
     // player online status
     private volatile boolean isOnline = false;
 
@@ -954,11 +957,16 @@ public class JobsPlayer {
             dao.recordPlayersLimitsAsync(this);
             dao.updateSeenAsync(this);
         } else {
-            dao.save(this);
-            dao.saveLog(this);
-            dao.savePoints(this);
-            dao.recordPlayersLimits(this);
-            dao.updateSeen(this);
+            addSavingTask();
+            try {
+                dao.save(this);
+                dao.saveLog(this);
+                dao.savePoints(this);
+                dao.recordPlayersLimits(this);
+                dao.updateSeen(this);
+            } finally {
+                finishSavingTask();
+            }
         }
 
         setSaved(true);
@@ -1009,6 +1017,18 @@ public class JobsPlayer {
     public boolean isOnline() {
         Player player = getPlayer();
         return player != null ? player.isOnline() : isOnline;
+    }
+
+    public boolean isSaving() {
+        return savingTaskCount.get() > 0;
+    }
+
+    public void addSavingTask() {
+        savingTaskCount.incrementAndGet();
+    }
+
+    public void finishSavingTask() {
+        savingTaskCount.decrementAndGet();
     }
 
     public boolean isSaved() {
