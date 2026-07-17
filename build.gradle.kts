@@ -4,13 +4,19 @@ plugins {
 }
 
 group = "Jobs"
-version = "5.2.6.7-Azisaba"
+version = "5.2.6.8-Azisaba"
 
 defaultTasks("clean", "install")
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+configurations.configureEach {
+    if (isCanBeResolved) {
+        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+    }
 }
 
 repositories {
@@ -80,6 +86,7 @@ dependencies {
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
+    options.release.set(8)
 }
 
 tasks.processResources {
@@ -90,6 +97,10 @@ tasks.processResources {
 
 tasks.jar {
     archiveFileName.set("Jobs${project.version}.jar")
+}
+
+tasks.withType<org.gradle.api.publish.tasks.GenerateModuleMetadata>().configureEach {
+    enabled = false
 }
 
 publishing {
