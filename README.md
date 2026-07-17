@@ -122,16 +122,15 @@ You can manually add the .jar file to your build path or you can use Jitpack if 
 </dependencies>
 ```
 
-### Gradle
+### Gradle Kotlin DSL
 
-```gradle
+```kotlin
 repositories {
-    maven { 
-        url 'https://jitpack.io' 
-    }
+    maven("https://jitpack.io")
 }
+
 dependencies {
-    implementation 'com.github.Zrips:Jobs:v5.2.6.2'
+    implementation("com.github.Zrips:Jobs:v5.2.6.2")
 }
 ```
 
