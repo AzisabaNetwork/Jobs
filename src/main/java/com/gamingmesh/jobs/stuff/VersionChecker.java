@@ -32,10 +32,9 @@ public final class VersionChecker {
             if (newVersion == null)
                 return;
 
-            int currentVersion = Integer.parseInt(plugin.getDescription().getVersion().replace(".", ""));
-            int newVer = Integer.parseInt(newVersion.replace(".", ""));
+            String currentVersion = plugin.getDescription().getVersion();
 
-            if (newVer <= currentVersion || currentVersion >= newVer)
+            if (compareVersions(newVersion, currentVersion) <= 0)
                 return;
 
             List<String> msg = Arrays.asList(
@@ -49,6 +48,42 @@ public final class VersionChecker {
                 else
                     CMIMessages.consoleMessage(one);
         });
+    }
+
+    /**
+     * Compares dotted version strings segment by segment, ignoring any non-numeric
+     * suffix such as "-Azisaba" or "-SNAPSHOT".
+     *
+     * @return positive if a is newer than b, negative if older, 0 if equal
+     */
+    static int compareVersions(String a, String b) {
+        int[] pa = parseVersion(a);
+        int[] pb = parseVersion(b);
+        for (int i = 0; i < Math.max(pa.length, pb.length); i++) {
+            int x = i < pa.length ? pa[i] : 0;
+            int y = i < pb.length ? pb[i] : 0;
+            if (x != y)
+                return Integer.compare(x, y);
+        }
+        return 0;
+    }
+
+    private static int[] parseVersion(String version) {
+        String cleaned = version.trim();
+        int dash = cleaned.indexOf('-');
+        if (dash >= 0)
+            cleaned = cleaned.substring(0, dash);
+        String[] parts = cleaned.split("\\.");
+        int[] result = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            String digits = parts[i].replaceAll("\\D.*$", "");
+            try {
+                result[i] = digits.isEmpty() ? 0 : Integer.parseInt(digits);
+            } catch (NumberFormatException e) {
+                result[i] = 0;
+            }
+        }
+        return result;
     }
 
     public String getNewVersion() {
