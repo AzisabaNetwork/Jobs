@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "Jobs"
-version = "5.2.6.8-Azisaba"
+version = "5.2.6.9-Azisaba"
 
 defaultTasks("clean", "install")
 
